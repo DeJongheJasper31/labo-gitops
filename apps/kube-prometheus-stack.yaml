@@ -1,0 +1,25 @@
+# Argo CD Application die de Helm-chart kube-prometheus-stack installeert.
+# Argo CD rendert de chart zelf (helm template) en past het resultaat toe.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kube-prometheus-stack
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://prometheus-community.github.io/helm-charts
+    chart: kube-prometheus-stack
+    targetRevision: 92.15.0
+    helm:
+      releaseName: kps
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: monitoring
+  syncPolicy:
+    automated:
+      prune: true      # resources die uit git verdwijnen worden ook uit het cluster verwijderd
+      selfHeal: true   # manuele wijzigingen in het cluster worden teruggezet naar de staat in git
+    syncOptions:
+      - CreateNamespace=true   # maakt namespace "monitoring" aan als die niet bestaat
+      - ServerSideApply=true   # nodig: de CRD's zijn te groot voor de last-applied annotatie
