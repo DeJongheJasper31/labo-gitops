@@ -1,0 +1,11 @@
+# Geeft de pod(s) met label app=hello-world een vast adres binnen het cluster.
+apiVersion: v1
+kind: Service
+metadata:
+  name: hello-world
+spec:
+  selector:
+    app: hello-world
+  ports:
+    - port: 80
+      targetPort: 80
