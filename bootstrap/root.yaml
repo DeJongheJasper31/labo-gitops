@@ -8,7 +8,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: REPLACE_ME
+    repoURL: https://github.com/DeJongheJasper31/labo-gitops.git
     targetRevision: main
     path: apps
   destination:
