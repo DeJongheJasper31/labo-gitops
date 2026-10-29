@@ -1,11 +1,17 @@
-# Geeft de pod(s) met label app=hello-world een vast adres binnen het cluster.
+# Geeft de pod een vast adres: poort 80 voor de website, 9113 voor de metrics.
 apiVersion: v1
 kind: Service
 metadata:
   name: hello-world
+  labels:
+    app: hello-world
 spec:
   selector:
     app: hello-world
   ports:
-    - port: 80
-      targetPort: 80
+    - name: http
+      port: 80
+      targetPort: http
+    - name: metrics
+      port: 9113
+      targetPort: metrics

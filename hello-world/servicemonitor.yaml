@@ -1,0 +1,16 @@
+# Zegt tegen Prometheus: haal elke 30 seconden de metrics op van de service hello-world.
+# Het label release: kps is nodig, want Prometheus uit kube-prometheus-stack
+# kijkt alleen naar ServiceMonitors met het label van zijn eigen release.
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: hello-world
+  labels:
+    release: kps
+spec:
+  selector:
+    matchLabels:
+      app: hello-world
+  endpoints:
+    - port: metrics
+      interval: 30s

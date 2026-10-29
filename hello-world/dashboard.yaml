@@ -1,0 +1,48 @@
+# Grafana-dashboard als ConfigMap. Grafana in kube-prometheus-stack laadt automatisch
+# elke ConfigMap met het label grafana_dashboard: "1". Hij staat in namespace
+# monitoring, naast Grafana zelf, zodat Grafana hem zeker vindt.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: hello-world-dashboard
+  namespace: monitoring
+  labels:
+    grafana_dashboard: "1"
+data:
+  hello-world.json: |
+    {
+      "title": "Hello World – bezoeken",
+      "uid": "hello-world-visits",
+      "schemaVersion": 39,
+      "time": { "from": "now-1h", "to": "now" },
+      "refresh": "10s",
+      "panels": [
+        {
+          "type": "stat",
+          "title": "Totaal aantal requests",
+          "gridPos": { "x": 0, "y": 0, "w": 8, "h": 8 },
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "targets": [
+            { "expr": "sum(nginx_http_requests_total{namespace=\"hello-world\"})", "refId": "A" }
+          ]
+        },
+        {
+          "type": "timeseries",
+          "title": "Requests per minuut",
+          "gridPos": { "x": 8, "y": 0, "w": 16, "h": 8 },
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "targets": [
+            { "expr": "sum(rate(nginx_http_requests_total{namespace=\"hello-world\"}[1m])) * 60", "refId": "A", "legendFormat": "requests/min" }
+          ]
+        },
+        {
+          "type": "stat",
+          "title": "Nginx bereikbaar (1 = ja)",
+          "gridPos": { "x": 0, "y": 8, "w": 8, "h": 4 },
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "targets": [
+            { "expr": "max(nginx_up{namespace=\"hello-world\"})", "refId": "A" }
+          ]
+        }
+      ]
+    }

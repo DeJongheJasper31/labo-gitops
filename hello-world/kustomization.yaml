@@ -1,12 +1,17 @@
 # Kustomize bundelt de manifests in deze map.
-# configMapGenerator zet index.html om in een ConfigMap. De naam krijgt een hash
-# van de inhoud mee, dus als je de HTML aanpast, herstart de pod automatisch.
+# configMapGenerator zet bestanden om in ConfigMaps. De naam krijgt een hash
+# van de inhoud mee, dus als je de HTML of config aanpast, herstart de pod automatisch.
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
   - deployment.yaml
   - service.yaml
+  - servicemonitor.yaml
+  - dashboard.yaml
 configMapGenerator:
   - name: hello-world-html
     files:
       - index.html
+  - name: hello-world-nginx-config
+    files:
+      - default.conf=nginx.conf

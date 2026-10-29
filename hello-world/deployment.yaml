@@ -1,4 +1,6 @@
-# Draait een nginx-container die de HTML uit de ConfigMap serveert.
+# Eén pod met twee containers:
+#  - nginx: serveert de HTML en houdt intern een teller van requests bij
+#  - exporter: leest die teller en biedt hem aan in Prometheus-formaat op poort 9113
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -19,14 +21,30 @@ spec:
         - name: nginx
           image: nginx:alpine
           ports:
-            - containerPort: 80
+            - name: http
+              containerPort: 80
           volumeMounts:
             - name: html
               mountPath: /usr/share/nginx/html   # hier zoekt nginx naar index.html
+            - name: nginx-config
+              mountPath: /etc/nginx/conf.d       # vervangt de standaardconfig van nginx
           resources:
             requests: { cpu: 10m, memory: 16Mi }
             limits:   { cpu: 100m, memory: 64Mi }
+        - name: exporter
+          image: nginx/nginx-prometheus-exporter:1.3.0
+          args:
+            - --nginx.scrape-uri=http://127.0.0.1:8080/stub_status
+          ports:
+            - name: metrics
+              containerPort: 9113
+          resources:
+            requests: { cpu: 10m, memory: 16Mi }
+            limits:   { cpu: 100m, memory: 32Mi }
       volumes:
         - name: html
           configMap:
-            name: hello-world-html   # kustomize vult de naam met hash automatisch in
+            name: hello-world-html
+        - name: nginx-config
+          configMap:
+            name: hello-world-nginx-config
